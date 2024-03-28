@@ -8,7 +8,7 @@ export const Users = () => {
   const { userId, edit } = params;
 
   return (
-    <div className="row">
+    <div>
       {edit ? (
         <EditUserPage userId={userId} />
       ) : userId ? (

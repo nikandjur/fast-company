@@ -1,44 +1,31 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../../../api";
-import { Link, useNavigate } from "react-router-dom";
-import { Qualitie } from "../../ui/qualitie";
+import { Comment } from "../../ui/comment";
+import { MeetingCard } from "../../ui/meetingCard";
+import { QualitiesCard } from "../../ui/qualitiesCard";
+import { UserCard } from "../../ui/userCard";
 
 export const UserPage = ({ userId }) => {
   const [user, setUser] = useState();
+  const navigate = useNavigate();
+  const getEditUser = () => navigate(`/users/${userId}/edit/`);
 
   useEffect(() => {
     API.users.getById(userId).then((data) => setUser(data));
   }, []);
 
-  const navigate = useNavigate();
-
-  const getAllUsers = () => navigate("/users");
-  const getEditUser = () => navigate(`/users/${userId}/edit/`);
-  console.log(user);
   return (
-    <div className="col-md-6 offset-md-3 shadow p-4">
+    <div className="container">
       {user ? (
-        <div>
-          UserPage
-          <h1>{user.name}</h1>
-          <h2>
-            Профессия:
-            {user.profession.name}
-          </h2>
-          {user.qualities.map((item) => (
-            <Qualitie key={item._id} {...item} />
-          ))}
-          <p>Рейтинг: {user.rate}</p>
-          <p>{user.completedMeetings}</p>
-          <div>
-            <p>
-              <button onClick={getAllUsers}>все пользователи</button>
-              <Link to="/users">All Users</Link>
-            </p>
-            <p>
-              <button onClick={getEditUser}>редактировать</button>
-              <Link to={`/users/${userId}/edit/`}>Edit</Link>
-            </p>
+        <div className="row gutters-sm">
+          <div className="col-md-4 mb-3">
+            <UserCard user={user} onClick={getEditUser} />
+            <QualitiesCard qualities={user.qualities} />
+            <MeetingCard meetings={user.completedMeetings} />
+          </div>
+          <div className="col-md-8">
+            <Comment />
           </div>
         </div>
       ) : (

@@ -159,9 +159,9 @@ export const EditUserPage = () => {
     console.log("data", data);
   }, [data]);
 
-  // useEffect(() => {
-  //   validate();
-  // }, []);
+  useEffect(() => {
+    validate();
+  }, []);
 
   const validatorConfig = {
     email: {
@@ -193,7 +193,7 @@ export const EditUserPage = () => {
               type="search"
               name="name"
               value={data.name}
-              // error={errors.email}
+              error={errors.email}
             />
             <TextField
               label="Почта"
@@ -211,7 +211,7 @@ export const EditUserPage = () => {
               options={professions}
               onChange={handleChange}
               value={data.profession}
-              // error={errors.profession}
+              error={errors.profession}
             />
             <RadioField
               options={[

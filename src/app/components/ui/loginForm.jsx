@@ -16,7 +16,7 @@ export const LoginForm = () => {
   // };
 
   const handleChange = (e) => {
-    console.log(e);
+    // console.log(e);
     // const { name, value } = e.target || e;
     const { name, value } = e.target ? e.target : e; // Определение источника данных
     // Извлечение данных из объекта события или объекта данных
@@ -56,12 +56,11 @@ export const LoginForm = () => {
   const validate = () => {
     const errors = validator(data, validatorConfig);
     setErrors(errors);
-    // console.log(Object.keys(errors).length === 0);
     // у объектов нет длины и булеан пустого объекта true
-
-    return Object.keys(errors).length === 0;
+    return Object.keys(errors).length === 0; // true or false
   };
 
+  // console.log("errors", errors);
   return (
     <>
       <form onSubmit={handleSubmit}>

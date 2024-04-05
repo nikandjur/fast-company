@@ -8,6 +8,7 @@ import { MultiSelectField } from "../../common/form/multiSelectField";
 import { CheckBoxField } from "../../common/form/checkBoxField";
 import { transform } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
+import BackHistoryButton from "../../common/backButton";
 
 // email: "",
 // password: "",
@@ -185,6 +186,7 @@ export const EditUserPage = () => {
   return (
     <div className="col-md-6 offset-md-3 shadow p-4">
       <div className="container mt-5">
+        <BackHistoryButton />
         {!isLoading ? (
           <form onSubmit={handleSubmit}>
             <TextField

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../../../api";
 import { Comment } from "../../ui/comment";
 import { MeetingCard } from "../../ui/meetingCard";
-import { QualitiesCard } from "../../ui/qualitiesCard";
+import QualitiesList from "../../ui/qualities/qualitiesList";
 import { UserCard } from "../../ui/userCard";
 
 export const UserPage = ({ userId }) => {
@@ -21,7 +21,7 @@ export const UserPage = ({ userId }) => {
         <div className="row gutters-sm">
           <div className="col-md-4 mb-3">
             <UserCard user={user} onClick={getEditUser} />
-            <QualitiesCard qualities={user.qualities} />
+            <QualitiesList qualities={user.qualities} />
             <MeetingCard meetings={user.completedMeetings} />
           </div>
           <div className="col-md-8">

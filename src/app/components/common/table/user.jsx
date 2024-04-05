@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Bookmark } from "../bookmark";
-import { Qualitie } from "../../ui/qualitie";
+import { Qualitie } from "../../ui/qualities";
+import { Profession } from "../../ui/profession";
 
 export const User = ({
   _id,
@@ -23,7 +24,7 @@ export const User = ({
           <Qualitie key={item._id} {...item} />
         ))}
       </td>
-      <td>{profession && profession.name}</td>
+      <td>{profession && <Profession id={profession} />}</td>
       <td>{completedMeetings}</td>
       <td>{rate} /5</td>
       <td>

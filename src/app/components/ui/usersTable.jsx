@@ -1,36 +1,61 @@
-import { User } from "../common/table/user";
+import React from "react";
+import { Bookmark } from "../common/bookmark";
+import Table from "../common/table";
+import { Link } from "react-router-dom";
+import { Profession } from "./profession";
+import Qualities from "./qualities";
 
-export const UsersTable = ({ users, onSort, onRenderSortArrow, ...rest }) => {
+export const UsersTable = ({
+  users,
+  onSort,
+  selectedSort,
+  onToggleBookMark,
+  onDelete,
+  ...rest
+}) => {
+  const columns = {
+    name: {
+      path: "name",
+      name: "Имя",
+      component: (user) => <Link to={`/users/${user._id}`}>{user.name}</Link>,
+    },
+    qualities: {
+      name: "Качества",
+      component: (user) => <Qualities qualities={user.qualities} />,
+    },
+    professions: {
+      name: "Профессия",
+      component: (user) => <Profession id={user.profession} />,
+    },
+    completedMeetings: {
+      path: "completedMeetings",
+      name: "Встретился, раз",
+    },
+    rate: { path: "rate", name: "Оценка" },
+    bookmark: {
+      path: "bookmark",
+      name: "Избранное",
+      component: (user) => (
+        <Bookmark
+          status={user.bookmark}
+          onClick={() => onToggleBookMark(user._id)}
+        />
+      ),
+    },
+    delete: {
+      component: (user) => (
+        <button onClick={() => onDelete(user._id)} className="btn btn-danger">
+          delete
+        </button>
+      ),
+    },
+  };
   return (
-    <table className="table">
-      <thead>
-        <tr>
-          <th onClick={() => onSort("name")} scope="col">
-            Имя {onRenderSortArrow("name")}
-          </th>
-          <th scope="col">Качества</th>
-          <th onClick={() => onSort("profession.name")} scope="col">
-            Профессия {onRenderSortArrow("profession.name")}
-          </th>
-          <th onClick={() => onSort("completedMeetings")} scope="col">
-            Встретился, раз {onRenderSortArrow("completedMeetings")}
-          </th>
-          <th onClick={() => onSort("rate")} scope="col">
-            Оценка
-          </th>
-          <th onClick={() => onSort("bookmark")} scope="col">
-            Избранное
-          </th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user) => (
-          <User key={user._id} {...user} {...rest} />
-          // {...user}Если вам нужно передать все свойства user в компонент.
-          //user={user} Если вам нужен только объект user внутри компонента
-        ))}
-      </tbody>
-    </table>
+    <Table
+      onSort={onSort}
+      selectedSort={selectedSort}
+      columns={columns}
+      data={users}
+    />
   );
 };

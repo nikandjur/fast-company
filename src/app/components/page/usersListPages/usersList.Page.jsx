@@ -7,26 +7,27 @@ import { Pagination } from "../../common/pagination";
 import { SearchStatus } from "../../ui/searchStatus";
 import { UsersTable } from "../../ui/usersTable";
 import { TextField } from "../../common/form/textField";
+import { useUsers } from "../../../hooks/useUsers";
 
 const UsersListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [professions, setProfessions] = useState();
   const [selectedItem, setSelectedItem] = useState();
-  const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
-  const [users, setUsers] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+  // const [selectedProf, setSelectedProf] = useState();
+  const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
+
   const pageSize = 8;
 
-  useEffect(() => {
-    API.users.fetchAll().then((data) => setUsers(data));
-  }, []);
+  const { users } = useUsers();
 
   useEffect(() => {
     API.professions.fetchAll().then((data) => setProfessions(data));
   }, []);
 
   const handleDelete = (userId) => {
-    setUsers(users.filter((user) => user._id !== userId));
+    // setUsers(users.filter((user) => user._id !== userId));
+    console.log(userId);
   };
 
   const handleToggleBookMark = (id) => {
@@ -36,7 +37,8 @@ const UsersListPage = () => {
       }
       return user;
     });
-    setUsers(newArray);
+    // setUsers(newArray);
+    console.log(newArray);
     // setUsers(users.map(user => (user._id === id ? { ...user, bookmark: !user.bookmark } : user)));
   };
 
@@ -56,16 +58,6 @@ const UsersListPage = () => {
     setSelectedItem(item);
     setCurrentPage(1);
   };
-  const renderSortArrow = (path) => {
-    if (sortBy.path === path) {
-      return sortBy.order === "asc" ? (
-        <i className="bi bi-caret-down-fill" />
-      ) : (
-        <i className="bi bi-caret-up-fill" />
-      );
-    }
-    return null;
-  };
 
   // const handleSort = (item) => {
   //   if (sortBy.path === item) {
@@ -78,13 +70,8 @@ const UsersListPage = () => {
   //   }
   // };
 
-  const handleSort = (path) => {
-    setSortBy((prevSortBy) => ({
-      ...prevSortBy,
-      path,
-      order:
-        prevSortBy.path === path && prevSortBy.order === "asc" ? "desc" : "asc",
-    }));
+  const handleSort = (item) => {
+    setSortBy(item);
   };
 
   if (users && professions) {
@@ -144,7 +131,7 @@ const UsersListPage = () => {
             <UsersTable
               users={userCrops}
               onSort={handleSort}
-              onRenderSortArrow={renderSortArrow}
+              selectedSort={sortBy}
               onToggleBookMark={handleToggleBookMark}
               onDelete={handleDelete}
             />

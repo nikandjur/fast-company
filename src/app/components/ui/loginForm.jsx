@@ -2,14 +2,21 @@ import { useEffect, useState } from "react";
 import { TextField } from "../common/form/textField";
 import { validator } from "../../utils/validator";
 import { CheckBoxField } from "../common/form/checkBoxField";
+import { useAuth } from "../../hooks/useAuth";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const LoginForm = () => {
+  const navigate = useNavigate();
+  // const location = useLocation();
+
+  const { logIn } = useAuth();
   const [data, setData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
+  const [enterError, setEnterError] = useState(null);
 
   // const handleChange = ({ target: { value, name }  }) => {
   //   setData({ ...data, [name]: value });
@@ -24,13 +31,22 @@ export const LoginForm = () => {
       ...prevData,
       [name]: value,
     }));
+    setEnterError(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const isValid = validate();
-    console.log(data);
     if (!isValid) return;
+
+    try {
+      await logIn(data);
+
+      // navigate("/users");
+      navigate("/users");
+    } catch (error) {
+      setEnterError(error.message);
+    }
   };
 
   useEffect(() => {
@@ -40,16 +56,9 @@ export const LoginForm = () => {
   const validatorConfig = {
     email: {
       isRequired: { message: "Email is required" },
-      isEmail: { message: "Email is invalid" },
     },
     password: {
       isRequired: { message: "Password is required" },
-      isCapitalized: { message: "Password must be capitalized" },
-      isContainDigit: { message: "Password must contain a digit" },
-      min: {
-        message: "Password must be at least 8 characters",
-        value: 8,
-      },
     },
   };
 
@@ -60,7 +69,8 @@ export const LoginForm = () => {
     return Object.keys(errors).length === 0; // true or false
   };
 
-  // console.log("errors", errors);
+  const isValid = Object.keys(errors).length === 0;
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -87,10 +97,11 @@ export const LoginForm = () => {
         >
           остаться в системе
         </CheckBoxField>
+        {enterError && <p className="text-danger">{enterError}</p>}
         <button
-          type="submit"
-          disabled={!(Object.keys(errors).length === 0)}
           className="btn btn-primary w-100 mx-auto"
+          type="submit"
+          disabled={!isValid || enterError}
         >
           Submit
         </button>

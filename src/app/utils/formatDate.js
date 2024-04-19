@@ -1,4 +1,4 @@
-export const formatDate = (timestamp) => {
+export const FormatDate = (timestamp) => {
   const date = new Date(parseInt(timestamp));
   const now = new Date();
   const diff = Math.abs(now - date);

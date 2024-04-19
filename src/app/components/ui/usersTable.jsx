@@ -10,7 +10,7 @@ export const UsersTable = ({
   onSort,
   selectedSort,
   onToggleBookMark,
-  onDelete,
+  // onDelete,
   ...rest
 }) => {
   const columns = {
@@ -42,13 +42,13 @@ export const UsersTable = ({
         />
       ),
     },
-    delete: {
-      component: (user) => (
-        <button onClick={() => onDelete(user._id)} className="btn btn-danger">
-          delete
-        </button>
-      ),
-    },
+    // delete: {
+    //   component: (user) => (
+    //     <button onClick={() => onDelete(user._id)} className="btn btn-danger">
+    //       delete
+    //     </button>
+    //   ),
+    // },
   };
   return (
     <Table

@@ -1,27 +1,12 @@
-import { useEffect, useState } from "react";
-import API from "../../../api";
+import React, { useState } from "react";
+
 import { validator } from "../../../utils/validator";
-import { SelectField } from "../form/selectField";
+import PropTypes from "prop-types";
 import { TextArea } from "../form/textArea";
-const initialData = { userId: "", content: "" };
 
-export const AddCommentForm = ({ onClick }) => {
-  const [data, setData] = useState(initialData);
-  const [users, setUsers] = useState({});
+export const AddCommentForm = ({ onSubmit }) => {
+  const [data, setData] = useState({});
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true);
-    API.users.fetchAll().then((data) => {
-      const usersData = data.map((user) => ({
-        value: user._id,
-        label: user.name,
-      }));
-      setUsers(usersData);
-      setIsLoading(false);
-    });
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target || e;
@@ -32,82 +17,58 @@ export const AddCommentForm = ({ onClick }) => {
       [name]: value,
     }));
   };
-  // const handleChange = (target) => {
+
+  // const handleChange = (e) => {
+  //   const target = e.target;
+  //   console.log(e.target.value);
   //   setData((prevState) => ({
   //     ...prevState,
   //     [target.name]: target.value,
   //   }));
   // };
-  const clearForm = () => {
-    setData(initialData);
-    setErrors({});
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!data.userId || !data.content) return;
-    const isValid = validate();
-    if (!isValid) return;
-    //   const comment = {
-    //   content: newComment,
-    //   pageId: userId,
-    //   userId: data.user,
-    // };
-    onClick(data);
-    clearForm();
-  };
-
-  useEffect(() => {
-    validate();
-  }, [data]);
 
   const validatorConfig = {
-    userId: {
-      isRequired: { message: "User is required" },
-    },
     content: {
-      isRequired: { message: "Content is required" },
+      isRequired: {
+        message: "Сообщение не может быть пустым",
+      },
     },
   };
 
   const validate = () => {
     const errors = validator(data, validatorConfig);
     setErrors(errors);
-    // у объектов нет длины и булеан пустого объекта true
-    return Object.keys(errors).length === 0; // true or false
+    return Object.keys(errors).length === 0;
+  };
+
+  const clearForm = () => {
+    setData({});
+    setErrors({});
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = validate();
+    if (!isValid) return;
+    onSubmit(data);
+    clearForm();
   };
 
   return (
-    <>
-      {!isLoading ? (
-        <div>
-          <form onSubmit={handleSubmit}>
-            <SelectField
-              onChange={handleChange}
-              options={users}
-              name="userId"
-              label="ADD COMMENT"
-              value={data.userId}
-              defaultOption="Choose..."
-              error={errors.userId}
-            />
-            <TextArea
-              value={data.content}
-              onChange={handleChange}
-              label="Comment"
-              name="content"
-              error={errors.content}
-            />
-
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-outline-secondary">
-                <i className={"bi bi-send"}>submit</i>
-              </button>
-            </div>
-          </form>
+    <div>
+      <h2>New comment</h2>
+      <form onSubmit={handleSubmit}>
+        <TextArea
+          value={data.content || ""}
+          onChange={handleChange}
+          name="content"
+          label="Сообщение"
+          error={errors.content}
+        />
+        <div className="d-flex justify-content-end">
+          <button className="btn btn-primary">Опубликовать</button>
         </div>
-      ) : (
-        <h2> Loading... </h2>
-      )}
-    </>
+      </form>
+    </div>
   );
 };

@@ -1,28 +1,25 @@
-import { useEffect, useState } from "react";
-import { formatDate } from "../../../utils/formatDate";
-import API from "../../../api";
+import { useAuth } from "../../../hooks/useAuth";
+import { useUsers } from "../../../hooks/useUsers";
+import { FormatDate } from "../../../utils/formatDate";
 
-export const Comment = ({ _id, userId, content, onClick, created_at }) => {
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(true);
+export const Comment = ({
+  content,
+  created_at: created,
+  _id: id,
+  userId,
+  onRemove,
+}) => {
+  const { getUserById } = useUsers();
+  const { currentUser } = useAuth();
+  const user = getUserById(userId);
 
-  useEffect(() => {
-    setLoading(true);
-    API.users.getById(userId).then((data) => setUser(data));
-    setLoading(false);
-  }, []);
-
-  return !loading ? (
+  return (
     <div className="bg-light card-body  mb-3">
       <div className="row">
         <div className="col">
           <div className="d-flex flex-start ">
             <img
-              src={`https://api.dicebear.com/8.x/adventurer/svg?seed=${(
-                Math.random() + 1
-              )
-                .toString(36)
-                .substring(7)}.svg`}
+              src={user.image}
               className="rounded-circle shadow-1-strong me-3"
               alt="avatar"
               width="65"
@@ -32,15 +29,17 @@ export const Comment = ({ _id, userId, content, onClick, created_at }) => {
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center">
                   <p className="mb-1 ">
-                    {user && user.name}
-                    <span className="small"> - {formatDate(created_at)}</span>
+                    {user && user.name}{" "}
+                    <span className="small">- {FormatDate(created)}</span>
                   </p>
-                  <button
-                    onClick={() => onClick(_id)}
-                    className="btn btn-sm text-primary d-flex align-items-center"
-                  >
-                    <i className="bi bi-x-lg"></i>
-                  </button>
+                  {currentUser._id === userId && (
+                    <button
+                      className="btn btn-sm text-primary d-flex align-items-center"
+                      onClick={() => onRemove(id)}
+                    >
+                      <i className="bi bi-x-lg"></i>
+                    </button>
+                  )}
                 </div>
                 <p className="small mb-0">{content}</p>
               </div>
@@ -49,7 +48,5 @@ export const Comment = ({ _id, userId, content, onClick, created_at }) => {
         </div>
       </div>
     </div>
-  ) : (
-    <h2>Loading...</h2>
   );
 };

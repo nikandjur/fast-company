@@ -1,29 +1,27 @@
-import React, { useEffect, useState } from "react";
 import _ from "lodash";
-import API from "../../../api";
+import React, { useState } from "react";
+import { useProfessions } from "../../../hooks/useProfession";
+import { useUsers } from "../../../hooks/useUsers";
 import { paginate } from "../../../utils/paginate";
+import { TextField } from "../../common/form/textField";
 import { GroupList } from "../../common/groupList";
 import { Pagination } from "../../common/pagination";
 import { SearchStatus } from "../../ui/searchStatus";
 import { UsersTable } from "../../ui/usersTable";
-import { TextField } from "../../common/form/textField";
-import { useUsers } from "../../../hooks/useUsers";
+import { useAuth } from "../../../hooks/useAuth";
 
 const UsersListPage = () => {
+  const { users } = useUsers();
+  const { currentUser } = useAuth();
+  const { professions, isLoading: professionsLoading } = useProfessions();
   const [currentPage, setCurrentPage] = useState(1);
-  const [professions, setProfessions] = useState();
+
   const [selectedItem, setSelectedItem] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   // const [selectedProf, setSelectedProf] = useState();
   const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
 
   const pageSize = 8;
-
-  const { users } = useUsers();
-
-  useEffect(() => {
-    API.professions.fetchAll().then((data) => setProfessions(data));
-  }, []);
 
   const handleDelete = (userId) => {
     // setUsers(users.filter((user) => user._id !== userId));
@@ -38,7 +36,7 @@ const UsersListPage = () => {
       return user;
     });
     // setUsers(newArray);
-    console.log(newArray);
+
     // setUsers(users.map(user => (user._id === id ? { ...user, bookmark: !user.bookmark } : user)));
   };
 
@@ -75,23 +73,29 @@ const UsersListPage = () => {
   };
 
   if (users && professions) {
-    const filteredUsers = searchQuery
-      ? // ? users.filter
-        // ((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        users.filter(
-          (user) =>
-            user.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1
-        )
-      : selectedItem
-      ? users.filter(
-          (user) =>
-            JSON.stringify(user.profession) === JSON.stringify(selectedItem)
-          //всегда идет сравнение двух объектов по ссылке а не по значениям .поэтому преобразуем объекты
-          //в строки JSON, включая их вложенные объекты. Затем строки сравниваются между собой.
-          //у этого подхода есть свои ограничения, например, он не учитывает порядок свойств в объектах.
-          //(или вариант сравнения по _id user.profession._id === selectedItem._id)
-        )
-      : users;
+    function filterUsers(data) {
+      const filteredUsers = searchQuery
+        ? // ? users.filter
+          // ((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          data.filter(
+            (user) =>
+              user.name.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1
+          )
+        : selectedItem
+        ? data.filter(
+            (user) =>
+              JSON.stringify(user.profession) === JSON.stringify(selectedItem)
+            //всегда идет сравнение двух объектов по ссылке а не по значениям .поэтому преобразуем объекты
+            //в строки JSON, включая их вложенные объекты. Затем строки сравниваются между собой.
+            //у этого подхода есть свои ограничения, например, он не учитывает порядок свойств в объектах.
+            //(или вариант сравнения по _id user.profession._id === selectedItem._id)
+          )
+        : data;
+
+      return filteredUsers.filter((u) => u._id !== currentUser._id);
+    }
+
+    const filteredUsers = filterUsers(users);
 
     const count = filteredUsers.length;
 
@@ -105,7 +109,7 @@ const UsersListPage = () => {
 
     return (
       <div className="d-flex">
-        {professions && (
+        {professions && !professionsLoading && (
           <div className="d-flex flex-column flex-shrink-0 p-3">
             <GroupList
               items={professions}
